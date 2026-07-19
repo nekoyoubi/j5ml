@@ -1,5 +1,5 @@
 {
-	"name": "j5ml",
+	"name": "@nxis/j5ml",
 	"version": "0.1.0",
 	"description": "J5ML: a JSON representation of a markup tree, with structured attribute values",
 	"keywords": [

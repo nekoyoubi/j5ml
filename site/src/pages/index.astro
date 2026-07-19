@@ -39,7 +39,7 @@ const STRUCTURED = `["Layout", { "constraints": ["Length:1", "Min:0", "Length:1"
 ["Gauge",  { "style": { "fg": "Green", "bold": true }, "percent": 62.5 }]
 ["Chart",  { "series": [{ "label": "cpu", "points": [1, 2, 3] }] }]`;
 
-const TS_USE = `import { isElement, parse, stringify } from "j5ml";
+const TS_USE = `import { isElement, parse, stringify } from "@nxis/j5ml";
 
 // Accepts JSON5, which subsumes JSON.
 const node = parse("['Gauge', { percent: 62.5, }]");
@@ -80,7 +80,7 @@ const tiers = [
 
 const implementations = [
 	{ name: "Rust", pkg: "j5ml", status: "asserted" },
-	{ name: "TypeScript", pkg: "j5ml", status: "asserted" },
+	{ name: "TypeScript", pkg: "@nxis/j5ml", status: "asserted" },
 	{ name: "C#", pkg: "J5ml", status: "planned" },
 	{ name: "Python", pkg: "j5ml", status: "planned" },
 ];
@@ -168,7 +168,7 @@ const sections = [
 					</Section>
 
 					<Section static variant="stage" label="typescript" padding="md">
-						<Code static lang="sh" code="npm install j5ml" />
+						<Code static lang="sh" code="npm install @nxis/j5ml" />
 						<Code static lang="ts" code={TS_USE} />
 					</Section>
 

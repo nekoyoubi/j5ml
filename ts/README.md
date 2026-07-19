@@ -3,7 +3,7 @@
 J5ML is a JSON representation of a markup tree.
 
 ```ts
-import { parse, stringify } from "j5ml";
+import { parse, stringify } from "@nxis/j5ml";
 
 const node = parse('["div",{"class":"panel"},"Hello"]');
 // { name: "div", attrs: { class: "panel" }, children: [{ text: "Hello" }] }
@@ -63,7 +63,7 @@ J5ML is a format, not a policy. It does not define which names are legal, what t
 `walk` is the traversal that check is built on. It visits a node and every descendant, parents before children, handing the visitor each node's path so a rejection can say *where*. Return `"skip"` to leave a subtree alone, or `"stop"` to end at the first finding; returning nothing continues.
 
 ```ts
-import { isElement, parse, pathToString, walk } from "j5ml";
+import { isElement, parse, pathToString, walk } from "@nxis/j5ml";
 
 const tree = parse('["doc",{},["script",{},"x"]]');
 
