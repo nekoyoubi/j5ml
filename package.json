@@ -7,6 +7,8 @@
     "dev": "pnpm -C site dev",
     "build": "pnpm -C site build",
     "preview": "pnpm -C site preview",
-    "site:install": "pnpm -C site install"
+    "site:install": "pnpm -C site install",
+    "version:bump": "node scripts/bump-version.mjs",
+    "release": "node scripts/release.mjs"
   }
 }
