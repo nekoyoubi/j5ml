@@ -1,0 +1,15 @@
+{
+	"name": "@j5ml/site",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "astro dev --port 4391",
+		"build": "astro build",
+		"preview": "astro preview --port 4392"
+	},
+	"dependencies": {
+		"@xtyle/astro": "^0.8.0",
+		"@xtyle/core": "^0.8.0",
+		"astro": "^6.4.8"
+	}
+}

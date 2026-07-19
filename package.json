@@ -1,0 +1,12 @@
+{
+  "name": "j5ml",
+  "private": true,
+  "description": "J5ML monorepo root: delegates site scripts into site/",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "dev": "pnpm -C site dev",
+    "build": "pnpm -C site build",
+    "preview": "pnpm -C site preview",
+    "site:install": "pnpm -C site install"
+  }
+}

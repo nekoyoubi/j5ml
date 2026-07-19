@@ -1,0 +1,128 @@
+---
+import { emit } from "@xtyle/core";
+import { utilitiesCss, componentsCss } from "@xtyle/core/css";
+import { MASTHEAD_NAME, VERSION, XRIPT_NAME, XTYLE_NAME, algorithm, register } from "../lib/brand.mjs";
+import AppShell from "@xtyle/astro/AppShell.astro";
+import Toolbar from "@xtyle/astro/Toolbar.astro";
+import Cluster from "@xtyle/astro/Cluster.astro";
+import Badge from "@xtyle/astro/Badge.astro";
+import Icon from "@xtyle/astro/Icon.astro";
+import "../styles/global.css";
+
+interface Props {
+	title: string;
+	description?: string;
+}
+const { title, description } = Astro.props;
+
+const TAGLINE = "A JSON representation of a markup tree.";
+const themeCss = emit(register, "css");
+const baseCss = `${utilitiesCss(algorithm.produces, algorithm.categories)}\n${componentsCss}`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description ?? TAGLINE} />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description ?? TAGLINE} />
+		<meta property="og:type" content="website" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Sigmar&display=swap" />
+		<style set:html={baseCss}></style>
+		<style set:html={themeCss}></style>
+	</head>
+	<body>
+		<a class="skip-link" href="#content">Skip to content</a>
+		<AppShell static>
+			<Toolbar static slot="toolbar" landmark>
+				<a slot="start" class="brand" href="/" aria-label="J5ML home">
+					<Icon static class="brand__mark" name={MASTHEAD_NAME} label="J5ML" />
+					<span class="brand__word">J5ML</span>
+				</a>
+				<Cluster static slot="end" gap="sm" align="center">
+					<Badge static tone="accent" variant="soft" size="sm">v{VERSION}</Badge>
+
+					<a
+						class="iconlink"
+						href="https://xtyle.dev"
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label="Styled with xtyle"
+						title="Styled with xtyle"
+						style="--glow: var(--cyan)"
+					>
+						<Icon static class="related-mark" name={XTYLE_NAME} label="xtyle" />
+					</a>
+
+					<a
+						class="iconlink"
+						href="https://xript.dev"
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label="Used by xript"
+						title="Used by xript"
+						style="--glow: var(--pink)"
+					>
+						<Icon static class="related-mark" name={XRIPT_NAME} label="xript" />
+					</a>
+
+					<a
+						class="iconlink"
+						href="https://crates.io/crates/j5ml"
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label="j5ml on crates.io"
+						title="j5ml on crates.io"
+						style="--glow: var(--orange)"
+					>
+						<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--orange)" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+							<path d="M12 2 3 6.5v11L12 22l9-4.5v-11L12 2Z" />
+							<path d="M3 6.5 12 11l9-4.5M12 11v11" />
+						</svg>
+					</a>
+
+					<a
+						class="iconlink"
+						href="https://www.npmjs.com/package/j5ml"
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label="j5ml on npm"
+						title="j5ml on npm"
+						style="--glow: var(--red)"
+					>
+						<svg viewBox="0 0 24 24" width="22" height="22" fill="var(--red)" aria-hidden="true">
+							<path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0H1.763zM5.13 5.323h13.741v10.288h-3.435V8.748h-3.43v6.863H5.13V5.323z" />
+						</svg>
+					</a>
+
+					<a
+						class="iconlink"
+						href="https://github.com/nekoyoubi/j5ml"
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label="j5ml on GitHub"
+						title="j5ml on GitHub"
+						style="--glow: var(--blue)"
+					>
+						<svg viewBox="0 0 16 16" width="20" height="20" fill="var(--blue)" aria-hidden="true">
+							<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z" />
+						</svg>
+					</a>
+				</Cluster>
+			</Toolbar>
+
+			<main class="page" id="content">
+				<slot />
+			</main>
+
+		</AppShell>
+	</body>
+</html>

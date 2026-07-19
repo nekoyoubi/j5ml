@@ -1,0 +1,51 @@
+{
+	"name": "j5ml",
+	"version": "0.1.0",
+	"description": "J5ML: a JSON representation of a markup tree, with structured attribute values",
+	"keywords": [
+		"json",
+		"json5",
+		"jsonml",
+		"markup",
+		"tree"
+	],
+	"license": "MIT OR Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nekoyoubi/j5ml.git",
+		"directory": "ts"
+	},
+	"homepage": "https://j5ml.dev",
+	"type": "module",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE-MIT",
+		"LICENSE-APACHE"
+	],
+	"sideEffects": false,
+	"scripts": {
+		"build": "tsup src/index.ts --format esm,cjs --dts --clean",
+		"test": "vitest run",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"json5": "^2.2.3"
+	},
+	"devDependencies": {
+		"@types/node": "^26.1.1",
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.2",
+		"vitest": "^3.2.4"
+	}
+}

@@ -1,0 +1,302 @@
+* { box-sizing: border-box; }
+
+body {
+	margin: 0;
+	font-family: var(--font-body, system-ui), sans-serif;
+	background: var(--bg-0);
+	color: var(--fg-0);
+}
+
+.skip-link {
+	position: absolute;
+	left: var(--space-4, 1rem);
+	top: -4rem;
+	z-index: 100;
+	padding: var(--space-2, .5rem) var(--space-4, 1rem);
+	border-radius: var(--radius-2, .375rem);
+	background: var(--accent);
+	color: var(--accent-fg);
+	font: inherit;
+	text-decoration: none;
+}
+.skip-link:focus { top: var(--space-3, .75rem); }
+
+.page {
+	max-width: 84rem;
+	margin: 0 auto;
+	padding: var(--space-7, 3rem) var(--space-6, 2rem) var(--space-9, 5rem);
+}
+
+/* The masthead treatment follows xtyle's own site: a display wordmark carrying
+   an accent glow that drifts toward the secondary accent, and nav links that
+   light up rather than underline. */
+.brand {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2, .5rem);
+	color: var(--fg-0);
+	text-decoration: none;
+	filter: drop-shadow(0 0 2px color-mix(in oklab, var(--accent) 70%, transparent))
+		drop-shadow(0 0 7px color-mix(in oklab, var(--accent) 45%, transparent));
+	animation: brand-bias 7s ease-in-out infinite;
+}
+.brand:hover { color: var(--fg-0); text-decoration: none; }
+.brand__word {
+	line-height: 1;
+	font-family: "Bungee", var(--font-sans, system-ui), sans-serif;
+	font-weight: 400;
+	font-size: var(--text-xl, 1.25rem);
+	letter-spacing: .01em;
+	position: relative;
+	top: 2px;
+	-webkit-text-stroke: .4px var(--bg-0);
+	paint-order: stroke;
+}
+
+@keyframes brand-bias {
+	0%, 100% {
+		filter: drop-shadow(0 0 2px color-mix(in oklab, var(--accent) 60%, transparent))
+			drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 40%, transparent));
+	}
+	50% {
+		filter: drop-shadow(0 0 3px color-mix(in oklab, var(--accent-2, var(--accent)) 85%, transparent))
+			drop-shadow(0 0 10px color-mix(in oklab, var(--accent-2, var(--accent)) 62%, transparent));
+	}
+}
+
+/* Icon links follow xtyle's masthead treatment: muted until hovered, then lit by
+   a per-link glow rather than an underline. Each link sets its own `--glow`. */
+.iconlink {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--fg-2);
+	text-decoration: none;
+	border-radius: var(--radius-2, .375rem);
+	padding: var(--space-1, .25rem);
+	transition: color .15s ease;
+}
+.iconlink:hover { color: var(--fg-0); text-decoration: none; }
+.iconlink > svg { transition: filter .18s ease; }
+.iconlink svg { display: block; }
+.iconlink:hover svg {
+	filter: drop-shadow(0 1px 6px color-mix(in oklab, var(--glow, var(--accent)) 45%, transparent))
+		drop-shadow(0 0 13px color-mix(in oklab, var(--glow, var(--accent)) 32%, transparent));
+}
+.iconlink:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* A generated mark is sized in `em`, so it needs an explicit size or it inherits
+   the link's 16px and lands smaller than the flat glyphs beside it. 24px matches
+   what these marks are set to on xtyle's own masthead. */
+.related-mark {
+	display: inline-flex;
+	font-size: 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.brand {
+		animation: none;
+		filter: drop-shadow(0 0 3px color-mix(in oklab, var(--accent) 70%, transparent))
+			drop-shadow(0 0 7px color-mix(in oklab, var(--accent) 45%, transparent));
+	}
+}
+
+/* Single column stacks hero → contents → sections, so a reader always meets the
+   page before its table of contents. Wide screens lift the contents into a rail
+   beside the sections without changing that reading order. */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6, 2rem); }
+.layout__body { min-width: 0; }
+.hero { order: 1; }
+.layout__nav { order: 2; }
+.layout__body { order: 3; }
+
+@media (min-width: 68rem) {
+	.layout { grid-template-columns: minmax(0, 1fr) 13rem; column-gap: var(--space-8, 4rem); row-gap: 0; }
+	.hero { grid-column: 1; grid-row: 1; }
+	.layout__nav { grid-column: 2; grid-row: 1; align-self: start; position: sticky; top: var(--space-5, 1.5rem); }
+	.layout__body { grid-column: 1; grid-row: 2; }
+}
+
+/* Running text is capped at a readable measure while code, tables, and framed
+   samples use the full column: a wide page should give the evidence more room
+   without making a paragraph a 110-character line. */
+/* `Text` renders as `xtyle-text` wrapping a span, so the measure is set on the
+   element itself; a `p` selector matches nothing outside the inlined spec. */
+.prose xtyle-text { display: block; }
+.prose :is(xtyle-text, ul, ol, blockquote),
+.spec :is(p, ul, ol, blockquote) { max-width: 78ch; }
+.layout__body :is(pre, .xtyle-table-wrap) { max-width: 100%; }
+
+.page :is(h1, h2, h3) { line-height: 1.2; text-wrap: balance; }
+.page p { text-wrap: pretty; }
+
+/* Section rhythm: each band is a beat, separated by space and a hairline rather
+   than by a standalone rule that reads as content. */
+/* The surface comes from the `Card` wrapper, the way xtyle's own hero demos
+   compose it; `Hero` contributes grid and padding only. The accent wash on top
+   is mixed from theme tokens rather than literals, so it follows a rederive. */
+.hero {
+	margin-block-end: var(--space-8, 4rem);
+	background-image:
+		radial-gradient(90% 130% at 12% 0%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 62%),
+		radial-gradient(70% 110% at 100% 100%, color-mix(in oklab, var(--accent-2, var(--accent)) 10%, transparent), transparent 60%);
+}
+
+/* The demo reads top-to-bottom as a translation: source, arrow, result. */
+.hero__demo { min-width: 0; }
+.hero__arrow {
+	color: var(--accent);
+	font-size: var(--text-lg, 1.125rem);
+	line-height: 1;
+	text-align: center;
+	padding-block: var(--space-1, .25rem);
+}
+
+.band {
+	padding-block: var(--space-8, 4rem);
+	border-top: 1px solid var(--line-2);
+}
+.band__head { display: flex; flex-direction: column; gap: var(--space-1, .25rem); margin-block-end: var(--space-2, .5rem); }
+.band--spec .band__head { margin-block-end: 0; }
+
+.page pre {
+	overflow-x: auto;
+	padding: var(--space-4, 1rem);
+	border-radius: var(--radius-2, .375rem);
+	background: var(--bg-1);
+	border: 1px solid var(--line-2);
+	tab-size: 2;
+}
+
+/* The inlined spec's fences are Shiki output, not `xtyle-code`, so they arrive
+   with none of that component's chrome. Shiki runs on its `css-variables` theme,
+   so its tokens are recoloured here from the derived palette rather than from a
+   second hardcoded theme that would drift when the anchors change. */
+.spec pre.astro-code {
+	background: var(--bg-1);
+	border: 1px solid var(--line-2);
+	border-radius: var(--radius-2, .375rem);
+	padding: var(--space-4, 1rem);
+	overflow-x: auto;
+	tab-size: 2;
+	font-size: var(--text-sm, .875rem);
+	line-height: 1.6;
+}
+
+.spec {
+	--astro-code-background: transparent;
+	--astro-code-foreground: var(--fg-1);
+	--astro-code-token-comment: var(--fg-3, var(--fg-2));
+	--astro-code-token-punctuation: var(--fg-2);
+	--astro-code-token-string: var(--accent);
+	--astro-code-token-string-expression: var(--accent);
+	--astro-code-token-constant: var(--accent);
+	--astro-code-token-keyword: var(--fg-0);
+	--astro-code-token-function: var(--fg-0);
+	--astro-code-token-parameter: var(--fg-1);
+	--astro-code-token-link: var(--accent);
+}
+.page :not(pre) > code {
+	background: var(--bg-2);
+	padding: .1em .35em;
+	border-radius: var(--radius-1, .25rem);
+	font-size: .9em;
+}
+
+.page table { width: 100%; border-collapse: collapse; margin: var(--space-4, 1rem) 0; }
+.page :is(th, td) { padding: .5rem .75rem; border-bottom: 1px solid var(--line-2); text-align: left; }
+.page th {
+	font-size: var(--text-sm, .875rem);
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	color: var(--fg-2);
+	border-bottom-color: var(--line);
+}
+.page tbody tr:last-child :is(th, td) { border-bottom: none; }
+.xtyle-table-wrap { overflow-x: auto; }
+
+.stat-row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+	gap: var(--space-4, 1rem);
+}
+
+.spacer { flex: 1; }
+
+/* The embedded spec is a document nested inside a page section. Its headings sit
+   two levels down, so they are restyled to read as the document's own scale
+   rather than as the tail of the page's heading ramp. */
+.spec :is(h3, h4, h5) { line-height: 1.2; font-weight: 600; }
+.spec > :first-child { margin-top: 0; }
+.spec h3 { font-size: var(--text-2xl, 1.5rem); margin-top: 2.5rem; }
+.spec h4 {
+	font-size: var(--text-xl, 1.25rem);
+	margin-top: 2.75rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--line-2);
+}
+.spec h5 { font-size: var(--text-lg, 1.125rem); margin-top: 1.75rem; color: var(--fg-1); }
+.spec blockquote {
+	margin: 1rem 0;
+	padding-left: 1rem;
+	border-left: 3px solid var(--accent);
+	color: var(--fg-1);
+}
+
+:where(a, button, summary, [tabindex]):focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+	border-radius: var(--radius-1, .25rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: .01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: .01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+.brand__mark { display: inline-flex; font-size: 26px; line-height: 1; }
+
+/* The rail carries the version and license the statusbar used to hold, so the
+   facts sit beside the contents instead of pinned to the bottom of the window. */
+.rail-meta {
+	margin: var(--space-5, 1.5rem) 0 0;
+	padding-top: var(--space-4, 1rem);
+	border-top: 1px solid var(--line-2);
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0;
+	font-size: var(--text-sm, .875rem);
+}
+.rail-meta dt {
+	color: var(--fg-2);
+	font-size: var(--text-xs, .75rem);
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+.rail-meta dd {
+	margin: 0 0 var(--space-3, .75rem);
+	color: var(--fg-1);
+}
+.rail-meta dd:last-child { margin-bottom: 0; }
+
+/* `TocItem` is flat with no nesting, so sub-entries are indented by id. The spec's
+   are keyed off the prefix the rehype plugin assigns; the page's own are listed,
+   since their ids carry no shared marker. */
+.layout__nav :is(
+	[data-toc-link^="spec-"],
+	[data-toc-link="jsonml-widened"],
+	[data-toc-link="what-that-buys"],
+	[data-toc-link="json-or-json5"],
+	[data-toc-link="values-keep-type"],
+	[data-toc-link="format-not-policy"],
+	[data-toc-link="three-tiers"],
+	[data-toc-link="corpus-is-spec"]
+) {
+	padding-inline-start: var(--space-4, 1rem);
+	font-size: var(--text-xs, .75rem);
+	opacity: .85;
+}

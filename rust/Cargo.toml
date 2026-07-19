@@ -1,0 +1,19 @@
+[package]
+name = "j5ml"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT OR Apache-2.0"
+description = "J5ML: a JSON representation of a markup tree, with structured attribute values"
+keywords = ["json", "jsonml", "markup", "serde", "tree"]
+categories = ["encoding", "parser-implementations"]
+readme = "README.md"
+repository = "https://github.com/nekoyoubi/j5ml"
+homepage = "https://j5ml.dev"
+documentation = "https://docs.rs/j5ml"
+
+[dependencies]
+json5 = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+

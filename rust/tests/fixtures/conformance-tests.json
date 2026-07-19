@@ -1,0 +1,514 @@
+{
+  "$comment": "The shared J5ML conformance corpus. Every implementation in this repository asserts against it. Where spec/j5ml.md and this file disagree, this file is authoritative. 'tree' uses a neutral encoding: an element is {name, attrs, children}, a text node is {text}. 'cases' are canonical JSON: parse, then serialize byte-exact. 'authoring' are JSON5 sources: parse, then serialize to the canonical JSON given. 'invalid' must be rejected by both parsers.",
+  "version": 1,
+  "cases": [
+    {
+      "name": "name-only element",
+      "json": "[\"div\"]",
+      "tree": {
+        "name": "div",
+        "attrs": {},
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "element with attributes",
+      "json": "[\"div\",{\"class\":\"panel\"}]",
+      "tree": {
+        "name": "div",
+        "attrs": {
+          "class": "panel"
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "element with a text child",
+      "json": "[\"p\",\"hello\"]",
+      "tree": {
+        "name": "p",
+        "attrs": {},
+        "children": [
+          {
+            "text": "hello"
+          }
+        ]
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "element with attributes and children",
+      "json": "[\"p\",{\"id\":\"x\"},\"a\",[\"em\",\"b\"]]",
+      "tree": {
+        "name": "p",
+        "attrs": {
+          "id": "x"
+        },
+        "children": [
+          {
+            "text": "a"
+          },
+          {
+            "name": "em",
+            "attrs": {},
+            "children": [
+              {
+                "text": "b"
+              }
+            ]
+          }
+        ]
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "an empty attribute object is dropped on serialization",
+      "json": "[\"div\",{}]",
+      "tree": {
+        "name": "div",
+        "attrs": {},
+        "children": []
+      },
+      "roundTrips": false,
+      "serializesTo": "[\"div\"]"
+    },
+    {
+      "name": "a bare string is a text node",
+      "json": "\"just text\"",
+      "tree": {
+        "text": "just text"
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "element names are case-sensitive",
+      "json": "[\"Panel\"]",
+      "tree": {
+        "name": "Panel",
+        "attrs": {},
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "attribute names are case-sensitive",
+      "json": "[\"Gauge\",{\"maxHealth\":100}]",
+      "tree": {
+        "name": "Gauge",
+        "attrs": {
+          "maxHealth": 100
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "hyphenated attribute names survive",
+      "json": "[\"span\",{\"data-bind\":\"health\"}]",
+      "tree": {
+        "name": "span",
+        "attrs": {
+          "data-bind": "health"
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "underscored attribute names survive",
+      "json": "[\"Gauge\",{\"ratio_bind\":\"health\"}]",
+      "tree": {
+        "name": "Gauge",
+        "attrs": {
+          "ratio_bind": "health"
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "namespaced element names survive",
+      "json": "[\"svg:circle\",{\"r\":5}]",
+      "tree": {
+        "name": "svg:circle",
+        "attrs": {
+          "r": 5
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "string attribute value",
+      "json": "[\"a\",{\"href\":\"/x\"}]",
+      "tree": {
+        "name": "a",
+        "attrs": {
+          "href": "/x"
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "boolean attribute value",
+      "json": "[\"input\",{\"disabled\":true}]",
+      "tree": {
+        "name": "input",
+        "attrs": {
+          "disabled": true
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "null attribute value",
+      "json": "[\"input\",{\"value\":null}]",
+      "tree": {
+        "name": "input",
+        "attrs": {
+          "value": null
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "a large integer keeps full precision",
+      "json": "[\"n\",{\"v\":16777217}]",
+      "tree": {
+        "name": "n",
+        "attrs": {
+          "v": 16777217
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "array attribute value",
+      "json": "[\"Layout\",{\"constraints\":[\"Length:1\",\"Min:0\"]}]",
+      "tree": {
+        "name": "Layout",
+        "attrs": {
+          "constraints": [
+            "Length:1",
+            "Min:0"
+          ]
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "object attribute value",
+      "json": "[\"Gauge\",{\"style\":{\"bold\":true,\"fg\":\"Green\"}}]",
+      "tree": {
+        "name": "Gauge",
+        "attrs": {
+          "style": {
+            "bold": true,
+            "fg": "Green"
+          }
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "nested structured values",
+      "json": "[\"x\",{\"a\":{\"b\":[1,{\"c\":null}]}}]",
+      "tree": {
+        "name": "x",
+        "attrs": {
+          "a": {
+            "b": [
+              1,
+              {
+                "c": null
+              }
+            ]
+          }
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "empty array attribute value",
+      "json": "[\"x\",{\"a\":[]}]",
+      "tree": {
+        "name": "x",
+        "attrs": {
+          "a": []
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "empty object attribute value",
+      "json": "[\"x\",{\"a\":{}}]",
+      "tree": {
+        "name": "x",
+        "attrs": {
+          "a": {}
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "deeply nested elements",
+      "json": "[\"a\",[\"b\",[\"c\",[\"d\",\"leaf\"]]]]",
+      "tree": {
+        "name": "a",
+        "attrs": {},
+        "children": [
+          {
+            "name": "b",
+            "attrs": {},
+            "children": [
+              {
+                "name": "c",
+                "attrs": {},
+                "children": [
+                  {
+                    "name": "d",
+                    "attrs": {},
+                    "children": [
+                      {
+                        "text": "leaf"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "mixed text and element children",
+      "json": "[\"p\",\"a\",[\"b\",\"c\"],\"d\"]",
+      "tree": {
+        "name": "p",
+        "attrs": {},
+        "children": [
+          {
+            "text": "a"
+          },
+          {
+            "name": "b",
+            "attrs": {},
+            "children": [
+              {
+                "text": "c"
+              }
+            ]
+          },
+          {
+            "text": "d"
+          }
+        ]
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "an empty string is a valid text node",
+      "json": "[\"p\",\"\"]",
+      "tree": {
+        "name": "p",
+        "attrs": {},
+        "children": [
+          {
+            "text": ""
+          }
+        ]
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "text children are not escaped by the parser",
+      "json": "[\"p\",\"<script>alert(1)</script>\"]",
+      "tree": {
+        "name": "p",
+        "attrs": {},
+        "children": [
+          {
+            "text": "<script>alert(1)</script>"
+          }
+        ]
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "a parser accepts names no consumer would render",
+      "json": "[\"script\",{\"src\":\"javascript:alert(1)\"}]",
+      "tree": {
+        "name": "script",
+        "attrs": {
+          "src": "javascript:alert(1)"
+        },
+        "children": []
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "the ratatui shape from the field",
+      "json": "[\"Block\",{\"border_style\":{\"fg\":\"Cyan\"},\"title\":\"Health\"},[\"Layout\",{\"constraints\":[\"Length:1\"],\"direction\":\"Vertical\"},[\"Gauge\",{\"data-bind\":\"health\",\"percent\":62.5}]]]",
+      "tree": {
+        "name": "Block",
+        "attrs": {
+          "border_style": {
+            "fg": "Cyan"
+          },
+          "title": "Health"
+        },
+        "children": [
+          {
+            "name": "Layout",
+            "attrs": {
+              "constraints": [
+                "Length:1"
+              ],
+              "direction": "Vertical"
+            },
+            "children": [
+              {
+                "name": "Gauge",
+                "attrs": {
+                  "data-bind": "health",
+                  "percent": 62.5
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      "roundTrips": true
+    },
+    {
+      "name": "attribute names are ordered on serialization",
+      "json": "[\"Block\",{\"title\":\"Health\",\"border_style\":{\"fg\":\"Cyan\"}}]",
+      "tree": {
+        "name": "Block",
+        "attrs": {
+          "title": "Health",
+          "border_style": {
+            "fg": "Cyan"
+          }
+        },
+        "children": []
+      },
+      "roundTrips": false,
+      "serializesTo": "[\"Block\",{\"border_style\":{\"fg\":\"Cyan\"},\"title\":\"Health\"}]"
+    },
+    {
+      "name": "keys nested inside an attribute value are ordered too",
+      "json": "[\"Gauge\",{\"style\":{\"fg\":\"Green\",\"bold\":true}}]",
+      "tree": {
+        "name": "Gauge",
+        "attrs": {
+          "style": {
+            "fg": "Green",
+            "bold": true
+          }
+        },
+        "children": []
+      },
+      "roundTrips": false,
+      "serializesTo": "[\"Gauge\",{\"style\":{\"bold\":true,\"fg\":\"Green\"}}]"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "an empty array is not an element",
+      "json": "[]",
+      "reason": "an element's first member must be a non-empty name"
+    },
+    {
+      "name": "an element name must be a string",
+      "json": "[1]",
+      "reason": "an element's first member must be a non-empty name"
+    },
+    {
+      "name": "an element name must not be empty",
+      "json": "[\"\"]",
+      "reason": "an element's first member must be a non-empty name"
+    },
+    {
+      "name": "a bare object is not an element",
+      "json": "{\"a\":1}",
+      "reason": "a document is an element or a text node"
+    },
+    {
+      "name": "a bare number is not an element",
+      "json": "5",
+      "reason": "a document is an element or a text node"
+    },
+    {
+      "name": "a child must be an element or text",
+      "json": "[\"p\",\"a\",5]",
+      "reason": "a child member must be a string or an array"
+    }
+  ],
+  "authoring": [
+    {
+      "name": "line comment",
+      "json5": "// a panel\n[\"div\"]",
+      "serializesTo": "[\"div\"]"
+    },
+    {
+      "name": "block comment",
+      "json5": "[\"div\" /* inline */ ]",
+      "serializesTo": "[\"div\"]"
+    },
+    {
+      "name": "trailing comma in an element",
+      "json5": "[\"p\",\"a\",]",
+      "serializesTo": "[\"p\",\"a\"]"
+    },
+    {
+      "name": "trailing comma in an attribute object",
+      "json5": "[\"div\",{\"a\":1,}]",
+      "serializesTo": "[\"div\",{\"a\":1}]"
+    },
+    {
+      "name": "trailing comma in an array value",
+      "json5": "[\"x\",{\"a\":[1,2,]}]",
+      "serializesTo": "[\"x\",{\"a\":[1,2]}]"
+    },
+    {
+      "name": "unquoted attribute name",
+      "json5": "[\"div\",{class:\"panel\"}]",
+      "serializesTo": "[\"div\",{\"class\":\"panel\"}]"
+    },
+    {
+      "name": "single-quoted string",
+      "json5": "[\"div\",{'class':'panel'}]",
+      "serializesTo": "[\"div\",{\"class\":\"panel\"}]"
+    },
+    {
+      "name": "single-quoted text node",
+      "json5": "[\"p\",'hello']",
+      "serializesTo": "[\"p\",\"hello\"]"
+    },
+    {
+      "name": "plain JSON parses identically",
+      "json5": "[\"div\",{\"class\":\"panel\"}]",
+      "serializesTo": "[\"div\",{\"class\":\"panel\"}]"
+    },
+    {
+      "name": "a hand-authored tree",
+      "json5": "// health panel\n[\"Block\", {\n  title: 'Health',        // shown in the border\n  border_style: { fg: 'Cyan' },\n},\n  [\"Gauge\", { percent: 62.5, }],\n]",
+      "serializesTo": "[\"Block\",{\"border_style\":{\"fg\":\"Cyan\"},\"title\":\"Health\"},[\"Gauge\",{\"percent\":62.5}]]"
+    }
+  ]
+}

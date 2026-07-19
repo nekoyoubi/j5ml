@@ -1,0 +1,375 @@
+---
+import Base from "../layouts/Base.astro";
+import Heading from "@xtyle/astro/Heading.astro";
+import Text from "@xtyle/astro/Text.astro";
+import Eyebrow from "@xtyle/astro/Eyebrow.astro";
+import Stack from "@xtyle/astro/Stack.astro";
+import Cluster from "@xtyle/astro/Cluster.astro";
+import Button from "@xtyle/astro/Button.astro";
+import Card from "@xtyle/astro/Card.astro";
+import Alert from "@xtyle/astro/Alert.astro";
+import Stat from "@xtyle/astro/Stat.astro";
+import Badge from "@xtyle/astro/Badge.astro";
+import Code from "@xtyle/astro/Code.astro";
+import Section from "@xtyle/astro/Section.astro";
+import Toc from "@xtyle/astro/Toc.astro";
+import Hero from "@xtyle/astro/Hero.astro";
+import { LICENSE, VERSION } from "../lib/brand.mjs";
+
+// The spec panel renders spec/j5ml.md directly, so this page cannot drift from
+// the source of truth. Editing the spec edits the site.
+import { Content as Spec, getHeadings } from "../../../spec/j5ml.md";
+import corpus from "../../../spec/conformance-tests.json";
+
+const HELLO = '["div", { "class": "panel" }, "Hello, ", ["em", {}, "world"]]';
+
+const HELLO_HTML = `<div class="panel">
+  Hello, <em>world</em>
+</div>`;
+
+const AUTHORED = `// health panel
+["Block", {
+  title: 'Health',                 // unquoted key, single-quoted string
+  border_style: { fg: 'Cyan' },
+},
+  ["Gauge", { percent: 62.5, }],   // trailing comma
+]`;
+
+const STRUCTURED = `["Layout", { "constraints": ["Length:1", "Min:0", "Length:1"] }]
+["Gauge",  { "style": { "fg": "Green", "bold": true }, "percent": 62.5 }]
+["Chart",  { "series": [{ "label": "cpu", "points": [1, 2, 3] }] }]`;
+
+const TS_USE = `import { isElement, parse, stringify } from "j5ml";
+
+// Accepts JSON5, which subsumes JSON.
+const node = parse("['Gauge', { percent: 62.5, }]");
+
+if (!isElement(node)) throw new Error("expected an element");
+console.assert(node.name === "Gauge");
+console.assert(node.attrs.percent === 62.5);
+
+// Always writes canonical JSON.
+console.assert(stringify(node) === '["Gauge",{"percent":62.5}]');`;
+
+const RUST_USE = `use j5ml::{from_str, to_string};
+
+// Accepts JSON5, which subsumes JSON.
+let node = from_str("['Gauge', { percent: 62.5, }]")?;
+
+let gauge = node.as_element().unwrap();
+assert_eq!(gauge.name, "Gauge");
+assert_eq!(gauge.attrs["percent"], 62.5);
+
+// Always writes canonical JSON.
+assert_eq!(to_string(&node)?, r#"["Gauge",{"percent":62.5}]"#);`;
+
+const valueRows = [
+	["string · number · true · false · null", "yes", "yes"],
+	["array", "no", "yes"],
+	["object", "no", "yes"],
+];
+
+const tiers = [
+	{ key: "cases", label: "canonical", count: corpus.cases.length,
+	  blurb: "Canonical JSON. Parse to the given tree, then serialize byte-exact." },
+	{ key: "authoring", label: "authoring", count: corpus.authoring.length,
+	  blurb: "JSON5 sources. Parse, then serialize to the canonical JSON recorded alongside." },
+	{ key: "invalid", label: "invalid", count: corpus.invalid.length,
+	  blurb: "Malformed documents a conforming parser must reject, each with its reason." },
+];
+
+const implementations = [
+	{ name: "Rust", pkg: "j5ml", status: "asserted" },
+	{ name: "TypeScript", pkg: "j5ml", status: "asserted" },
+	{ name: "C#", pkg: "J5ml", status: "planned" },
+	{ name: "Python", pkg: "j5ml", status: "planned" },
+];
+
+// The spec's own sections become sub-entries, read from the rendered document
+// rather than restated here, so the rail cannot drift from the prose. The rehype
+// plugin has already prefixed the slugs, and `depth` 4 is the spec's top level
+// after it renests two levels down.
+// The spec's `Conformance` is dropped: the page has its own section of that name,
+// and two identical labels in a thirteen-entry rail read as a bug rather than as
+// a hierarchy.
+const specSections = getHeadings()
+	.filter((heading) => heading.depth === 4 && heading.slug !== "spec-conformance")
+	.map((heading) => ({ id: heading.slug, label: heading.text }));
+
+const sections = [
+	{ id: "j5ml", label: "J5ML" },
+	{ id: "install", label: "Install" },
+	{ id: "overview", label: "Overview" },
+	{ id: "jsonml-widened", label: "It is JsonML, widened" },
+	{ id: "what-that-buys", label: "What that buys" },
+	{ id: "json-or-json5", label: "Written in JSON or JSON5" },
+	{ id: "values-keep-type", label: "Values keep their type" },
+	{ id: "format-not-policy", label: "A format, not a policy" },
+	{ id: "spec", label: "Spec" },
+	...specSections,
+	{ id: "conformance", label: "Conformance" },
+	{ id: "three-tiers", label: "Three tiers" },
+	{ id: "corpus-is-spec", label: "The corpus is the specification" },
+];
+---
+
+<Base title="J5ML" description="A JSON representation of a markup tree, with structured attribute values and JSON5 authoring.">
+	<div class="layout">
+		<Card static tone="accent" depthStrength="lg" class="hero" id="j5ml">
+			<Hero static split align="start">
+			<Stack static gap="md" class="prose">
+				<Stack static gap="xs">
+					<Eyebrow static>JsonML, widened</Eyebrow>
+					<Heading static level={1} size="3xl">A markup tree that carries data</Heading>
+					<Text static size="lg" tone="muted">
+						Markup describes trees. JSON describes data. J5ML is for documents that do both at
+						once: a tree whose nodes carry typed, structured values, with no second format
+						smuggled through a string.
+					</Text>
+				</Stack>
+
+				<Cluster static gap="sm">
+					<Button static href="https://github.com/nekoyoubi/j5ml" tone="accent">GitHub</Button>
+					<Button static href="https://crates.io/crates/j5ml" variant="soft">crates.io</Button>
+				</Cluster>
+			</Stack>
+
+			<Stack static gap="xs" class="hero__demo">
+				<Code static lang="html" code={HELLO_HTML} caption="HTML" />
+				<span class="hero__arrow" aria-hidden="true">&darr;</span>
+				<Code static lang="json" code={HELLO} caption="J5ML" wrap />
+			</Stack>
+			</Hero>
+		</Card>
+
+		<div class="layout__nav">
+			<Toc static items={sections} label="" />
+			<dl class="rail-meta">
+				<dt>Version</dt><dd>v{VERSION}</dd>
+				<dt>License</dt><dd>{LICENSE}</dd>
+			</dl>
+		</div>
+
+		<div class="layout__body">
+			<section class="band" id="install" aria-labelledby="install-h">
+				<Stack static gap="md">
+					<div class="band__head">
+						<Eyebrow static>01</Eyebrow>
+						<Heading static level={2} size="xl" id="install-h">Install</Heading>
+					</div>
+
+					<Text static tone="muted" class="prose">
+						Rust and TypeScript are written and asserted against the corpus. The rest land as they are written, each against the same one.
+					</Text>
+
+					<Section static variant="stage" label="rust" padding="md">
+						<Code static lang="sh" code="cargo add j5ml" />
+						<Code static lang="rust" code={RUST_USE} />
+					</Section>
+
+					<Section static variant="stage" label="typescript" padding="md">
+						<Code static lang="sh" code="npm install j5ml" />
+						<Code static lang="ts" code={TS_USE} />
+					</Section>
+
+					<div class="xtyle-table-wrap">
+						<table>
+							<thead><tr><th>Language</th><th>Package</th><th>Status</th></tr></thead>
+							<tbody>
+								{implementations.map((impl) => (
+									<tr>
+										<td>{impl.name}</td>
+										<td><code>{impl.pkg}</code></td>
+										<td>
+											<Badge static tone={impl.status === "asserted" ? "success" : "neutral"} fill="soft">
+												{impl.status}
+											</Badge>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</Stack>
+			</section>
+
+			<section class="band" id="overview" aria-labelledby="overview-h">
+				<Stack static gap="lg">
+					<div class="band__head">
+						<Eyebrow static>02</Eyebrow>
+						<Heading static level={2} size="xl" id="overview-h">Overview</Heading>
+					</div>
+
+					<Card static>
+						<Stack static gap="sm" class="prose">
+							<Heading static level={3} size="lg" id="jsonml-widened">It is JsonML, widened</Heading>
+							<Text static>
+								JsonML was designed for lossless round-trip conversion between XML and JSON,
+								and says plainly that it "was never intended to be the way that everything
+								that could be expressed in XML should be expressed in JSON." J5ML takes it
+								at its word.
+							</Text>
+							<Text static>
+								One consequence of that design center runs through everything: in XML, an
+								attribute value is text. A tree whose nodes carry a list, a record, or a
+								number that is still a number on arrival has to string-encode it and parse
+								it back by hand, or promote it to child elements and lose the line between
+								a node's configuration and its contents.
+							</Text>
+						</Stack>
+						<div class="xtyle-table-wrap">
+							<table>
+								<thead><tr><th>attribute value</th><th>JsonML</th><th>J5ML</th></tr></thead>
+								<tbody>
+									{valueRows.map(([kind, a, b]) => (
+										<tr><td><code>{kind}</code></td><td>{a}</td><td><strong>{b}</strong></td></tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+						<Text static tone="muted" size="sm">
+							Every valid JsonML document is valid J5ML. The reverse is not.
+						</Text>
+					</Card>
+
+					<Stack static gap="sm" class="prose">
+						<Heading static level={3} size="lg" id="what-that-buys">What that buys</Heading>
+						<Text static>
+							A node's configuration is often a collection or a structured value, and a
+							grammar built for XML attributes has nowhere to put either. A <code>Gauge</code>'s
+							style is a property of the gauge, not a child of it.
+						</Text>
+					</Stack>
+
+					<Section static variant="stage" label="structured attribute values" padding="md">
+						<Code static lang="json" code={STRUCTURED} />
+					</Section>
+
+					<Stack static gap="sm" class="prose">
+						<Heading static level={3} size="lg" id="json-or-json5">Written in JSON or JSON5</Heading>
+						<Text static>
+							A conforming parser accepts JSON5. That costs nothing, because JSON is a
+							strict subset of it: a JSON document parses identically, so there is no mode
+							flag and no question about what a given file is. Hand-authored trees are a
+							first-class use of this format, and JSON is a hostile syntax to write by hand.
+						</Text>
+					</Stack>
+
+					<Section static variant="stage" label="hand-authored, json5" padding="md">
+						<Code static lang="json5" code={AUTHORED} caption="panel.j5ml" />
+					</Section>
+
+					<Alert static severity="info">
+						<Fragment slot="title">JSON5 in, canonical JSON out</Fragment>
+						A conforming serializer emits canonical JSON and never JSON5, so anything a J5ML
+						implementation writes is readable by a plain JSON parser. Comments and trailing
+						commas are authoring affordances and do not survive a round trip.
+					</Alert>
+
+					<Stack static gap="sm" class="prose">
+						<Heading static level={3} size="lg" id="values-keep-type">Values keep their type</Heading>
+						<Text static>
+							A number arrives as a number, a boolean as a boolean, a list as a list. An
+							implementation must not coerce a value to a string in transit. String-coercion
+							mid-pipeline is where structure quietly becomes text and the type is lost for
+							good, and it is where a value slips past a check that only inspected strings.
+						</Text>
+
+						<Heading static level={3} size="lg" id="format-not-policy">A format, not a policy</Heading>
+						<Text static>
+							J5ML does not define which element names are legal, what any name means, or
+							whether a document is safe to render. A parser accepts any well-formed tree,
+							including one naming elements a given consumer would refuse.
+						</Text>
+					</Stack>
+
+					<Alert static severity="warn">
+						<Fragment slot="title">Sanitize before rendering</Fragment>
+						A consumer that renders J5ML into a medium where markup is executable must
+						sanitize it first. J5ML neither performs nor implies sanitization.
+					</Alert>
+				</Stack>
+			</section>
+
+			<section class="band band--spec" id="spec" aria-labelledby="spec-h">
+				<Stack static gap="md">
+					<div class="band__head">
+						<Eyebrow static>03</Eyebrow>
+						<Heading static level={2} size="xl" id="spec-h">Spec</Heading>
+					</div>
+
+					<Alert static severity="info">
+						<Fragment slot="title">Generated from the repository</Fragment>
+						This renders <code>spec/j5ml.md</code> directly. The conformance corpus is
+						authoritative over both; where the prose and the corpus disagree, the prose is a bug.
+					</Alert>
+
+					<article class="spec prose"><Spec /></article>
+				</Stack>
+			</section>
+
+			<section class="band" id="conformance" aria-labelledby="conformance-h">
+				<Stack static gap="lg">
+					<div class="band__head">
+						<Eyebrow static>04</Eyebrow>
+						<Heading static level={2} size="xl" id="conformance-h">Conformance</Heading>
+					</div>
+
+					<Text static size="lg" tone="muted" class="prose">
+						Prose drifts from code. Every implementation is asserted against one shared
+						corpus, so an implementation cannot diverge from the format without failing.
+					</Text>
+
+					<div class="stat-row">
+						{tiers.map((tier) => (
+							<Stat static size="lg" label={tier.label} caption="cases">{tier.count}</Stat>
+						))}
+					</div>
+
+					<Card static>
+						<Stack static gap="sm" class="prose">
+							<Heading static level={3} size="lg" id="three-tiers">Three tiers</Heading>
+							{tiers.map((tier) => (
+								<Stack static gap="2xs">
+									<Text static weight="semibold"><code>{tier.key}</code></Text>
+									<Text static tone="muted">{tier.blurb}</Text>
+								</Stack>
+							))}
+						</Stack>
+					</Card>
+
+					<Stack static gap="sm" class="prose">
+						<Heading static level={3} size="lg" id="corpus-is-spec">The corpus is the specification</Heading>
+						<Text static>
+							A change to the format is a change to the corpus, which every implementation
+							must then satisfy. This is not ceremony: the corpus settled a
+							cross-implementation question before a second implementation existed. An integral
+							number written <code>100.0</code> serializes as <code>100</code> in JavaScript
+							and <code>100.0</code> elsewhere, so the corpus pins the integer form and holds
+							every implementation to it.
+						</Text>
+					</Stack>
+
+					<div class="xtyle-table-wrap">
+						<table>
+							<thead><tr><th>Language</th><th>Package</th><th>Corpus</th></tr></thead>
+							<tbody>
+								{implementations.map((impl) => (
+									<tr>
+										<td>{impl.name}</td>
+										<td><code>{impl.pkg}</code></td>
+										<td>
+											<Badge static tone={impl.status === "asserted" ? "success" : "neutral"} fill="soft">
+												{impl.status}
+											</Badge>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</Stack>
+			</section>
+		</div>
+	</div>
+</Base>

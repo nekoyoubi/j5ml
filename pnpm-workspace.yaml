@@ -1,0 +1,5 @@
+packages:
+  - site
+  - ts
+patchedDependencies:
+  '@xtyle/astro@0.8.0': patches/@xtyle__astro@0.8.0.patch

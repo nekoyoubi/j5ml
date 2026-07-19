@@ -1,0 +1,43 @@
+diff --git a/src/Hero.astro b/src/Hero.astro
+index 93899b4a147f8fa18286cff5032c8c11638db128..70f4647b4c47f825540b1c1ff865b09da4e3b445 100644
+--- a/src/Hero.astro
++++ b/src/Hero.astro
+@@ -4,16 +4,18 @@ type HeroAlign = "center" | "start";
+ interface Props {
+ 	align?: HeroAlign;
+ 	split?: boolean;
++	/** Render zero-JS: the layout is pure CSS, so the hero renders the same either way. */
++	static?: boolean;
+ 	class?: string;
+ 	/** Any other attribute (`id`, `title`, `data-*`, `aria-*`, …) passes through to the element. */
+ 	[key: string]: unknown;
+ }
+ 
+-const { align = "center", split = false, class: extra, ...rest } = Astro.props;
++const { align = "center", split = false, static: isStatic = false, class: extra, ...rest } = Astro.props;
+ ---
+ 
+ <xtyle-hero align={align !== "center" ? align : undefined} split={split ? "" : undefined} class={extra} {...rest}>
+ 	<slot />
+ </xtyle-hero>
+ 
+-<script>import "@xtyle/core/elements";</script>
++{!isStatic && <script>import "@xtyle/core/elements";</script>}
+diff --git a/src/internal/palette.ts b/src/internal/palette.ts
+index ab69219e616c5b7ddb212d52027434d4176d2db5..e0680ea0b14b63a21e65ae6bc3151b3408f3f77a 100644
+--- a/src/internal/palette.ts
++++ b/src/internal/palette.ts
+@@ -1,11 +1,11 @@
+ import { derive, seriesPalette, seriesColorsFor, rampColor, glowFilter, categoricalHeatColors, matrixCeiling, resolveIconMark, composeIconThemed, qrScannability, type Palette, type QrMode } from "@xtyle/core";
+-import { resolveAlgorithm } from "@xtyle/core/host";
++import { getAlgorithm } from "@xtyle/core/algorithms";
+ 
+ /** Baking colors at build time needs a register; the runtime theme isn't known yet, so SSR uses the
+  * default one and the upgraded element re-resolves against the live cascade. Memoized per build. */
+ let cached: Promise<Record<string, string>> | null = null;
+ async function defaultRegister(): Promise<Record<string, string>> {
+-	cached ??= (async () => derive(await resolveAlgorithm("xtyle-default"), {}))();
++	cached ??= (async () => derive(getAlgorithm("xtyle-default"), {}))();
+ 	return cached;
+ }
+ 
