@@ -12,7 +12,8 @@ This is a multi-language monorepo. One spec, one shared conformance corpus, N im
 | `spec/conformance-tests.json` | the shared corpus every implementation is asserted against |
 | `rust/` | the `j5ml` crate: serde-based, complete |
 | `ts/` | the `@nxis/j5ml` npm package: JSON5-based, complete |
-| `csharp/` `python/` | planned; the directories are placeholders |
+| `csharp/` | the `J5ml` NuGet package: hand-written JSON5 reader and canonical writer, complete |
+| `python/` | planned |
 | `site/` | Astro site for j5ml.dev |
 
 ## The corpus is the specification
@@ -72,6 +73,33 @@ A `Node` is `Element { name, attrs, children }` or `Text { text }`. That is the 
 
 **`canonical()` is not optional.** It sorts attribute names by code point before serializing, recursively through attribute values. Do not swap it for `Object.keys().sort()`: that orders by UTF-16 code unit, which disagrees with UTF-8 byte order above U+FFFF, and names may hold any character a JSON string may hold.
 
+## C# implementation
+
+```
+dotnet test csharp/tests/J5ml.Tests/J5ml.Tests.csproj
+```
+
+There is no solution file, so this takes the project path and runs from the repo root. CI and `scripts/implementations.mjs` use the same command.
+
+Public API on `J5mlDocument`:
+
+- `Parse`: accepts JSON5, which subsumes JSON; the default entry point
+- `ParseJson`: strict JSON only, via `JsonNode.Parse`, whose defaults already reject comments and trailing commas
+- `Stringify`: always emits canonical JSON
+- `Traverse`: visits a node and its descendants, parents before children, with each node's path
+
+Named `Traverse` rather than `Walk` because `Walk` is the enum a visitor returns.
+
+Attribute values are `System.Text.Json.Nodes.JsonNode`. Values read out of a parsed tree are `DeepClone`d on the way into an element, since a `JsonNode` tracks a parent and throws if it is attached in two places.
+
+**Two pieces are hand-written on purpose, and neither should be swapped for a library call.**
+
+`Json5Parser` reads JSON5 directly rather than rewriting it into JSON and delegating. A rewrite would have to reproduce string escaping and number formatting exactly to avoid altering the document in transit, and error positions would point at rewritten text. This mirrors the Rust crate's rule about the `json5` crate.
+
+`CanonicalJson` writes the output instead of `JsonNode.ToJsonString`. System.Text.Json's encoders are configured with `UnicodeRange`s, which only describe the BMP, so **every character above U+FFFF is escaped as a surrogate pair** no matter which built-in encoder is chosen, `UnsafeRelaxedJsonEscaping` included. `serde_json` and `JSON.stringify` both write those characters literally, so delegating here would emit `"😀"` where the other implementations emit the character and break byte-exact round-tripping. The corpus pins this with `attribute names above U+FFFF are ordered by code point`.
+
+Integers are kept as integers through the parser so serialization never grows a fractional part, and a number that came from a JSON parse is written back from `JsonElement.GetRawText()` so its original spelling survives.
+
 ## Format, not policy
 
 J5ML does not define which element names are legal, what any name means, or whether a document is safe to render. A parser accepts any well-formed tree. Consumers layer their own vocabulary and safety rules on top, and a consumer rendering into a medium where markup is executable must sanitize first. Do not add validation, name folding, or a built-in element vocabulary to an implementation; those belong to consumers.
@@ -80,13 +108,13 @@ J5ML does not define which element names are legal, what any name means, or whet
 
 The [`jsonml`](https://crates.io/crates/jsonml) crate is a faithful implementation of the original grammar and is the right choice for XML round-tripping. J5ML is not a competitor to it and should not be framed as one; the README points XML round-trippers at it deliberately. Keep that framing in any docs or copy.
 
-## Revisit when xtyle 0.9 lands
+## `site/src/lib/spec-headings.mjs` stays
 
-Three things here are workarounds for `@xtyle/astro@0.8.0` and should be deleted, not carried forward:
+This rehype plugin renests and re-slugs the inlined spec's headings. It looks like something `@xtyle/astro`'s `Markdown` component should replace, and it is not.
 
-- `patches/@xtyle__astro@0.8.0.patch`: swaps `resolveAlgorithm` for `getAlgorithm` so generated icon marks bake (the published package omits the `algorithms/` directory the former reads), and adds a `static` prop to `Hero` so it stops loading the element runtime for a pure-CSS layout. Both are fixed upstream or unnecessary once the version moves; drop the patch and the `patchedDependencies` entry in `pnpm-workspace.yaml`.
-- `site/src/lib/spec-headings.mjs`: renests and re-slugs the inlined spec's headings. **0.9 is expected to ship an `<xtyle-markdown>` component**, which is what this hand-rolls; prefer it and delete the plugin plus the `.spec pre.astro-code` rules in `global.css`.
-- The `data-toc-link` indent selectors in `global.css`. `TocItem` is flat in 0.8, so subsection hierarchy is painted on with CSS; if `Toc` gains a `level`, hand `getHeadings()` through instead.
+`Markdown` wraps `renderMarkdown(source)`, which takes no options: no heading offset, no id prefix, and no way to read the headings back out. The plugin exists to do all three. `spec/j5ml.md` is a standalone document that owns an `<h1>`, so inlining it under the page's own `Spec` section means dropping every heading two levels and prefixing each id to clear the page's slugs. The page's table of contents is then built from `getHeadings()`, which reports those transformed headings precisely because the plugin runs inside Astro's markdown pipeline.
+
+Swapping in `Markdown` would render an `<h1>` mid-page, collide the spec's slugs with the page's, and drop every spec entry from the rail. Keep the plugin, and keep the `.spec pre.astro-code` rules in `global.css` that style the code fences it renders.
 
 ## Conventions
 

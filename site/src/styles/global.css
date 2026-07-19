@@ -283,20 +283,3 @@ body {
 }
 .rail-meta dd:last-child { margin-bottom: 0; }
 
-/* `TocItem` is flat with no nesting, so sub-entries are indented by id. The spec's
-   are keyed off the prefix the rehype plugin assigns; the page's own are listed,
-   since their ids carry no shared marker. */
-.layout__nav :is(
-	[data-toc-link^="spec-"],
-	[data-toc-link="jsonml-widened"],
-	[data-toc-link="what-that-buys"],
-	[data-toc-link="json-or-json5"],
-	[data-toc-link="values-keep-type"],
-	[data-toc-link="format-not-policy"],
-	[data-toc-link="three-tiers"],
-	[data-toc-link="corpus-is-spec"]
-) {
-	padding-inline-start: var(--space-4, 1rem);
-	font-size: var(--text-xs, .75rem);
-	opacity: .85;
-}

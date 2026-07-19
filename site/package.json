@@ -8,8 +8,8 @@
 		"preview": "astro preview --port 4392"
 	},
 	"dependencies": {
-		"@xtyle/astro": "^0.8.0",
-		"@xtyle/core": "^0.8.0",
+		"@xtyle/astro": "^0.9.0",
+		"@xtyle/core": "^0.9.0",
 		"astro": "^6.4.8"
 	}
 }

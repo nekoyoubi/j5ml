@@ -63,6 +63,18 @@ assert_eq!(gauge.attrs["percent"], 62.5);
 // Always writes canonical JSON.
 assert_eq!(to_string(&node)?, r#"["Gauge",{"percent":62.5}]"#);`;
 
+const CS_USE = `using J5ml;
+
+// Accepts JSON5, which subsumes JSON.
+var node = J5mlDocument.Parse("['Gauge', { percent: 62.5, }]");
+
+var gauge = (Element)node;
+Debug.Assert(gauge.Name == "Gauge");
+Debug.Assert(gauge.Attrs["percent"]!.GetValue<double>() == 62.5);
+
+// Always writes canonical JSON.
+Debug.Assert(J5mlDocument.Stringify(node) == """["Gauge",{"percent":62.5}]""");`;
+
 const valueRows = [
 	["string · number · true · false · null", "yes", "yes"],
 	["array", "no", "yes"],
@@ -81,7 +93,7 @@ const tiers = [
 const implementations = [
 	{ name: "Rust", pkg: "j5ml", status: "asserted" },
 	{ name: "TypeScript", pkg: "@nxis/j5ml", status: "asserted" },
-	{ name: "C#", pkg: "J5ml", status: "planned" },
+	{ name: "C#", pkg: "J5ml", status: "asserted" },
 	{ name: "Python", pkg: "j5ml", status: "planned" },
 ];
 
@@ -94,22 +106,22 @@ const implementations = [
 // a hierarchy.
 const specSections = getHeadings()
 	.filter((heading) => heading.depth === 4 && heading.slug !== "spec-conformance")
-	.map((heading) => ({ id: heading.slug, label: heading.text }));
+	.map((heading) => ({ id: heading.slug, label: heading.text, level: 2 }));
 
 const sections = [
-	{ id: "j5ml", label: "J5ML" },
-	{ id: "install", label: "Install" },
-	{ id: "overview", label: "Overview" },
-	{ id: "jsonml-widened", label: "It is JsonML, widened" },
-	{ id: "what-that-buys", label: "What that buys" },
-	{ id: "json-or-json5", label: "Written in JSON or JSON5" },
-	{ id: "values-keep-type", label: "Values keep their type" },
-	{ id: "format-not-policy", label: "A format, not a policy" },
-	{ id: "spec", label: "Spec" },
+	{ id: "j5ml", label: "J5ML", level: 1 },
+	{ id: "install", label: "Install", level: 1 },
+	{ id: "overview", label: "Overview", level: 1 },
+	{ id: "jsonml-widened", label: "It is JsonML, widened", level: 2 },
+	{ id: "what-that-buys", label: "What that buys", level: 2 },
+	{ id: "json-or-json5", label: "Written in JSON or JSON5", level: 2 },
+	{ id: "values-keep-type", label: "Values keep their type", level: 2 },
+	{ id: "format-not-policy", label: "A format, not a policy", level: 2 },
+	{ id: "spec", label: "Spec", level: 1 },
 	...specSections,
-	{ id: "conformance", label: "Conformance" },
-	{ id: "three-tiers", label: "Three tiers" },
-	{ id: "corpus-is-spec", label: "The corpus is the specification" },
+	{ id: "conformance", label: "Conformance", level: 1 },
+	{ id: "three-tiers", label: "Three tiers", level: 2 },
+	{ id: "corpus-is-spec", label: "The corpus is the specification", level: 2 },
 ];
 ---
 
@@ -130,7 +142,7 @@ const sections = [
 
 				<Cluster static gap="sm">
 					<Button static href="https://github.com/nekoyoubi/j5ml" tone="accent">GitHub</Button>
-					<Button static href="https://crates.io/crates/j5ml" variant="soft">crates.io</Button>
+					<Button static href="https://crates.io/crates/j5ml" variant="subtle">crates.io</Button>
 				</Cluster>
 			</Stack>
 
@@ -159,7 +171,7 @@ const sections = [
 					</div>
 
 					<Text static tone="muted" class="prose">
-						Rust and TypeScript are written and asserted against the corpus. The rest land as they are written, each against the same one.
+						Rust, TypeScript, and C# are written and asserted against the corpus. The rest land as they are written, each against the same one.
 					</Text>
 
 					<Section static variant="stage" label="rust" padding="md">
@@ -170,6 +182,11 @@ const sections = [
 					<Section static variant="stage" label="typescript" padding="md">
 						<Code static lang="sh" code="npm install @nxis/j5ml" />
 						<Code static lang="ts" code={TS_USE} />
+					</Section>
+
+					<Section static variant="stage" label="c#" padding="md">
+						<Code static lang="sh" code="dotnet add package J5ml" />
+						<Code static lang="csharp" code={CS_USE} />
 					</Section>
 
 					<div class="xtyle-table-wrap">

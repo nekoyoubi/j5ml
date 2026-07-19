@@ -23,3 +23,12 @@ jobs:
       - run: pnpm -C ts typecheck
       - run: pnpm -C ts test
       - run: pnpm -C ts build
+
+  csharp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - run: dotnet test csharp/tests/J5ml.Tests/J5ml.Tests.csproj -c Release

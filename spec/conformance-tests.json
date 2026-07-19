@@ -411,6 +411,36 @@
       "serializesTo": "[\"Block\",{\"border_style\":{\"fg\":\"Cyan\"},\"title\":\"Health\"}]"
     },
     {
+      "name": "attribute names above U+FFFF are ordered by code point",
+      "json": "[\"x\",{\"😀\":1,\"�\":2}]",
+      "tree": {
+        "name": "x",
+        "attrs": {
+          "😀": 1,
+          "�": 2
+        },
+        "children": []
+      },
+      "roundTrips": false,
+      "serializesTo": "[\"x\",{\"�\":2,\"😀\":1}]"
+    },
+    {
+      "name": "keys above U+FFFF nested inside an attribute value are ordered too",
+      "json": "[\"x\",{\"style\":{\"😀\":1,\"�\":2}}]",
+      "tree": {
+        "name": "x",
+        "attrs": {
+          "style": {
+            "😀": 1,
+            "�": 2
+          }
+        },
+        "children": []
+      },
+      "roundTrips": false,
+      "serializesTo": "[\"x\",{\"style\":{\"�\":2,\"😀\":1}}]"
+    },
+    {
       "name": "keys nested inside an attribute value are ordered too",
       "json": "[\"Gauge\",{\"style\":{\"fg\":\"Green\",\"bold\":true}}]",
       "tree": {

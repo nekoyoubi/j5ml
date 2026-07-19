@@ -1,5 +1,40 @@
 # Changelog
 
+## v0.2.0
+
+A third implementation, the corpus case that had to exist before it could be trusted, and the release plumbing to publish all three.
+
+### C#
+
+- **`J5ml` on NuGet, asserted against the same corpus.** `Parse` accepts JSON5, `ParseJson` refuses it, `Stringify` writes canonical JSON, and `Traverse` walks a tree parents-first handing each node its path. The surface is the one the other two already have
+  - attribute values are `System.Text.Json.Nodes.JsonNode`, so any JSON value is legal and keeps its type
+  - values are `DeepClone`d into an element, because a `JsonNode` tracks a parent and refuses to be attached twice
+- **The JSON5 reader is hand-written, not a rewrite that delegates.** Turning JSON5 into JSON first would have to reproduce string escaping and number formatting exactly to avoid altering the document on the way through, and a syntax error's position would point at the rewritten text instead of at what was authored
+- **The serializer is hand-written too, and it had to be.** System.Text.Json configures its encoders with `UnicodeRange`s, which describe only the Basic Multilingual Plane, so every character above U+FFFF is escaped as a surrogate pair under every built-in encoder including `UnsafeRelaxedJsonEscaping`. Rust and TypeScript both emit those characters literally, so delegating would have written `"\ud83d\ude00"` where they write `"😀"`, and the document would no longer round-trip
+
+### The corpus
+
+- **Added a case for attribute names above U+FFFF.** The ordering rule was previously asserted only in the TypeScript package's own tests, which is exactly the thing the corpus exists to prevent: C# passed all 110 conformance cases while emitting different bytes than the other two for any document carrying an emoji
+  - the case pins both halves at once, since it orders an astral name against a BMP one and expects the astral character back out unescaped
+
+### Packaging
+
+- **The npm package is `@nxis/j5ml`.** npm refuses `j5ml` unscoped: it sits close enough to `jsml` and `json5` to trip the similarity check, and every near variant fails the same test, so no unscoped name was going to clear it. The crate stays `j5ml` and the NuGet package is `J5ml`, since neither registry has that check
+  - `import { parse } from "j5ml"` becomes `import { parse } from "@nxis/j5ml"`; nothing else about the package moved
+- **Publishing is automated for all three registries.** Cutting a release fires one workflow per registry, so nothing is pushed by hand: npm over OIDC, crates.io and NuGet from stored tokens
+- **`pnpm release` gates a release before it can happen.** It refuses a version mismatch between the three manifests, a dirty tree, a branch that is not `main`, an unpushed commit, an existing tag, or a missing changelog section, then runs every suite before tagging. `--dry-run` walks the gates without tagging
+- **`pnpm version:bump` writes one version across all three manifests**, which is the agreement the release gate then checks
+- **Both release scripts read one list of implementations** rather than each naming the languages itself. Adding C# to a pair of scripts that knew about two would have left the third manifest behind on the next bump, and a gate comparing two versions cannot see a third disagree: the tag would have gone out with npm and crates.io on the new version and NuGet refusing a version it had already published. The same shape as the corpus gap, one layer out
+- **CI runs the TypeScript and C# suites** on every push and pull request. Rust stays a local gate
+
+### The site
+
+- **Moved to xtyle 0.9 and deleted the patch.** `@xtyle/core` ships its `algorithms` directory now, so generated icon marks bake unaided, and `Hero` takes a `static` prop upstream
+- **Table-of-contents hierarchy is structural.** `TocItem` carries a `level`, so `Toc` emits real nested lists instead of a rail indented by a hand-listed set of ids in CSS
+- **The crates.io button moved off the `soft` variant**, which 0.9 no longer accepts and had been quietly falling back to `solid`
+- **Every registry is linked from the toolbar and badged in its README.** crates.io, npm, and NuGet each get a mark in the masthead and a version badge on the package that ships there
+- **Pages builds from the workflow rather than from the repository root**, so the published site is `site/dist` and nothing else in the repository is served
+
 ## v0.1.0
 
 In XML an attribute value is text, so in JsonML's grammar an attribute value is text. J5ML widens that one production and spends the rest of its effort on what happens afterward: what an implementation may and may not do to a document in transit, and a corpus that fails an implementation that gets it wrong.

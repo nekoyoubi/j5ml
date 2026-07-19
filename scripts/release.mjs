@@ -4,6 +4,8 @@ import { readFileSync } from "node:fs";
 import { execSync, spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
+import { implementations } from "./implementations.mjs";
+
 const root = resolve(import.meta.dirname, "..");
 const dryRun = process.argv.includes("--dry-run");
 
@@ -13,13 +15,24 @@ const die = (msg) => {
 	process.exit(1);
 };
 
-const tsVersion = JSON.parse(readFileSync(resolve(root, "ts/package.json"), "utf8")).version;
-const cargoVersion = readFileSync(resolve(root, "rust/Cargo.toml"), "utf8").match(/^version\s*=\s*"([^"]+)"/m)?.[1];
+const versions = implementations.map((implementation) => ({
+	id: implementation.id,
+	manifest: implementation.manifest,
+	version: implementation.readVersion(),
+}));
 
-if (tsVersion !== cargoVersion)
-	die(`Version mismatch: ts/package.json is ${tsVersion}, rust/Cargo.toml is ${cargoVersion}.\nRun 'pnpm version:bump <version>' to sync them.`);
+const [first, ...rest] = versions;
+const disagreeing = rest.filter((entry) => entry.version !== first.version);
+if (disagreeing.length > 0) {
+	const listed = versions
+		.map((entry) => `  ${entry.manifest} is ${entry.version ?? "unreadable"}`)
+		.join("\n");
+	die(`The implementations disagree on the version:\n${listed}\nRun 'pnpm version:bump <version>' to sync them.`);
+}
 
-const version = tsVersion;
+const version = first.version;
+if (!version) die(`Could not read a version from ${first.manifest}.`);
+
 const tag = `v${version}`;
 
 const branch = run("git branch --show-current");
@@ -46,15 +59,15 @@ const body = (nextHeader === -1 ? afterHeader : afterHeader.slice(0, nextHeader)
 if (!body) die(`The '${header}' section in CHANGELOG.md is empty.`);
 
 console.log(`Releasing ${tag}`);
-console.log(`  rust:  ${cargoVersion}`);
-console.log(`  ts:    ${tsVersion}`);
+for (const entry of versions) console.log(`  ${entry.id.padEnd(10)} ${entry.version}`);
 console.log(`  notes: ${body.split("\n").length} lines from CHANGELOG.md`);
 
 console.log("\nRunning test suites...");
 const shell = (cmd, opts = {}) => spawnSync(cmd, { cwd: root, stdio: "inherit", shell: true, ...opts });
 
-if (shell("cargo test --manifest-path rust/Cargo.toml").status !== 0) die("Rust tests failed.");
-if (shell("pnpm -C ts test").status !== 0) die("TypeScript tests failed.");
+for (const implementation of implementations) {
+	if (shell(implementation.test).status !== 0) die(`The ${implementation.id} suite failed.`);
+}
 
 if (dryRun) {
 	console.log(`\nDry run: every gate passed. ${tag} is ready to release.`);
@@ -69,7 +82,5 @@ shell(`gh release create ${tag} --title ${tag} --notes-file -`, {
 	stdio: ["pipe", "inherit", "inherit"],
 });
 
-console.log(`\nRelease ${tag} created: https://github.com/nekoyoubi/j5ml/releases/tag/${tag}`);
-console.log("\nPublish the packages:");
-console.log("  cargo publish --manifest-path rust/Cargo.toml");
-console.log("  pnpm -C ts build && pnpm -C ts publish --access public --no-git-checks");
+console.log(`\nRelease ${tag} created. Publish workflows should fire momentarily.`);
+console.log(`View at: https://github.com/nekoyoubi/j5ml/releases/tag/${tag}`);

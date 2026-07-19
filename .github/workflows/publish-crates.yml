@@ -1,0 +1,21 @@
+name: Publish to crates.io
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: test
+        run: cargo test --manifest-path rust/Cargo.toml
+
+      - name: publish j5ml
+        run: cargo publish --manifest-path rust/Cargo.toml
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
