@@ -51,10 +51,10 @@ console.log(`  ts:    ${tsVersion}`);
 console.log(`  notes: ${body.split("\n").length} lines from CHANGELOG.md`);
 
 console.log("\nRunning test suites...");
-const rust = spawnSync("cargo", ["test", "--manifest-path", "rust/Cargo.toml"], { cwd: root, stdio: "inherit", shell: true });
-if (rust.status !== 0) die("Rust tests failed.");
-const ts = spawnSync("pnpm", ["-C", "ts", "test"], { cwd: root, stdio: "inherit", shell: true });
-if (ts.status !== 0) die("TypeScript tests failed.");
+const shell = (cmd, opts = {}) => spawnSync(cmd, { cwd: root, stdio: "inherit", shell: true, ...opts });
+
+if (shell("cargo test --manifest-path rust/Cargo.toml").status !== 0) die("Rust tests failed.");
+if (shell("pnpm -C ts test").status !== 0) die("TypeScript tests failed.");
 
 if (dryRun) {
 	console.log(`\nDry run: every gate passed. ${tag} is ready to release.`);
@@ -64,11 +64,9 @@ if (dryRun) {
 execSync(`git tag -a ${tag} -m ${tag}`, { cwd: root, stdio: "inherit" });
 execSync(`git push origin ${tag}`, { cwd: root, stdio: "inherit" });
 
-spawnSync("gh", ["release", "create", tag, "--title", tag, "--notes-file", "-"], {
-	cwd: root,
+shell(`gh release create ${tag} --title ${tag} --notes-file -`, {
 	input: body,
 	stdio: ["pipe", "inherit", "inherit"],
-	shell: true,
 });
 
 console.log(`\nRelease ${tag} created: https://github.com/nekoyoubi/j5ml/releases/tag/${tag}`);
