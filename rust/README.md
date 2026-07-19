@@ -2,6 +2,8 @@
 
 J5ML is a JSON representation of a markup tree.
 
+[![Crates.io](https://img.shields.io/crates/v/j5ml)](https://crates.io/crates/j5ml)
+
 ```rust
 use j5ml::{from_str, to_string, Node};
 

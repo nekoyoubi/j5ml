@@ -1,7 +1,7 @@
 ---
 import { emit } from "@xtyle/core";
 import { utilitiesCss, componentsCss } from "@xtyle/core/css";
-import { MASTHEAD_NAME, VERSION, XRIPT_NAME, XTYLE_NAME, algorithm, register } from "../lib/brand.mjs";
+import { CRATES_NAME, MASTHEAD_NAME, VERSION, XRIPT_NAME, XTYLE_NAME, algorithm, bakeLogo, register } from "../lib/brand.mjs";
 import AppShell from "@xtyle/astro/AppShell.astro";
 import Toolbar from "@xtyle/astro/Toolbar.astro";
 import Cluster from "@xtyle/astro/Cluster.astro";
@@ -19,6 +19,10 @@ const TAGLINE = "A JSON representation of a markup tree.";
 const themeCss = emit(register, "css");
 const baseCss = `${utilitiesCss(algorithm.produces, algorithm.categories)}\n${componentsCss}`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+// `Icon` drops its `label` for a generated mark, so the mark is baked here to
+// title itself after the link rather than after its own name.
+const cratesMark = bakeLogo({ name: CRATES_NAME, label: "j5ml on crates.io" });
 ---
 
 <!doctype html>
@@ -83,10 +87,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
 						title="j5ml on crates.io"
 						style="--glow: var(--orange)"
 					>
-						<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--orange)" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
-							<path d="M12 2 3 6.5v11L12 22l9-4.5v-11L12 2Z" />
-							<path d="M3 6.5 12 11l9-4.5M12 11v11" />
-						</svg>
+						<span class="related-mark" set:html={cratesMark} />
 					</a>
 
 					<a
@@ -99,7 +100,21 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
 						style="--glow: var(--red)"
 					>
 						<svg viewBox="0 0 24 24" width="22" height="22" fill="var(--red)" aria-hidden="true">
-							<path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0H1.763zM5.13 5.323h13.741v10.288h-3.435V8.748h-3.43v6.863H5.13V5.323z" />
+							<path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z" />
+						</svg>
+					</a>
+
+					<a
+						class="iconlink"
+						href="https://www.nuget.org/packages/J5ml"
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label="J5ml on NuGet"
+						title="J5ml on NuGet"
+						style="--glow: var(--blue, var(--accent-2, var(--accent)))"
+					>
+						<svg viewBox="0 0 24 24" width="21" height="21" fill="var(--blue, var(--accent-2, var(--accent)))" aria-hidden="true">
+							<path d="M1.998.342a1.997 1.997 0 1 0 0 3.995 1.997 1.997 0 0 0 0-3.995zm9.18 4.34a6.156 6.156 0 0 0-6.153 6.155v6.667c0 3.4 2.756 6.154 6.154 6.154h6.667c3.4 0 6.154-2.755 6.154-6.154v-6.667a6.154 6.154 0 0 0-6.154-6.155zm-1.477 2.8a2.496 2.496 0 1 1 0 4.993 2.496 2.496 0 0 1 0-4.993zm7.968 6.16a3.996 3.996 0 1 1-.002 7.992 3.996 3.996 0 0 1 .002-7.992z" />
 						</svg>
 					</a>
 

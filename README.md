@@ -3,6 +3,7 @@
 [![CI](https://github.com/nekoyoubi/j5ml/actions/workflows/ci.yml/badge.svg)](https://github.com/nekoyoubi/j5ml/actions/workflows/ci.yml)
 [![crates.io](https://img.shields.io/crates/v/j5ml?label=crates.io)](https://crates.io/crates/j5ml)
 [![npm](https://img.shields.io/npm/v/%40nxis%2Fj5ml?label=npm)](https://www.npmjs.com/package/@nxis/j5ml)
+[![nuget](https://img.shields.io/nuget/v/J5ml?label=nuget)](https://www.nuget.org/packages/J5ml)
 [![docs](https://img.shields.io/badge/docs-j5ml.dev-blue)](https://j5ml.dev)
 [![license](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green)](#license)
 
@@ -115,7 +116,8 @@ Under JsonML each of these has to encode its structure as a string and parse it 
 | `spec/conformance-tests.json` | the shared corpus every implementation is asserted against |
 | `rust/` | `j5ml`, Rust, serde-based |
 | `ts/` | `@nxis/j5ml`, TypeScript, JSON5-based |
-| *(planned)* | C#, Python |
+| `csharp/` | `J5ml`, C#, System.Text.Json-based |
+| *(planned)* | Python |
 
 ## The corpus is the specification
 

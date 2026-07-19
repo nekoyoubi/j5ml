@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>J5ml</PackageId>
+    <Version>0.2.0</Version>
+    <Authors>nekoyoubi</Authors>
+    <Description>J5ML: a JSON representation of a markup tree, with structured attribute values</Description>
+    <PackageTags>json;json5;jsonml;markup;tree</PackageTags>
+    <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://j5ml.dev</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nekoyoubi/j5ml</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../../LICENSE-MIT" Pack="true" PackagePath="/" />
+    <None Include="../../../LICENSE-APACHE" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

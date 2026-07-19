@@ -50,3 +50,10 @@ coverage/
 NUL
 .scratch/
 .playwright-mcp/
+
+# dotnet
+[Bb]in/
+[Oo]bj/
+*.user
+*.nupkg
+*.snupkg

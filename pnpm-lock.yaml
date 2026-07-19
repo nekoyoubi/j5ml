@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  '@xtyle/astro@0.8.0':
-    hash: 1a4bba02fe89eede9707a1f0affa68a4b5ee32ec2d737e9f875ddba4cc1f1b6c
-    path: patches/@xtyle__astro@0.8.0.patch
-
 importers:
 
   .: {}
@@ -16,11 +11,11 @@ importers:
   site:
     dependencies:
       '@xtyle/astro':
-        specifier: ^0.8.0
-        version: 0.8.0(patch_hash=1a4bba02fe89eede9707a1f0affa68a4b5ee32ec2d737e9f875ddba4cc1f1b6c)(astro@6.4.8(@types/node@26.1.1)(rollup@4.62.2))
+        specifier: ^0.9.0
+        version: 0.9.0(astro@6.4.8(@types/node@26.1.1)(rollup@4.62.2))
       '@xtyle/core':
-        specifier: ^0.8.0
-        version: 0.8.0
+        specifier: ^0.9.0
+        version: 0.9.0
       astro:
         specifier: ^6.4.8
         version: 6.4.8(@types/node@26.1.1)(rollup@4.62.2)
@@ -697,13 +692,13 @@ packages:
   '@xriptjs/sanitize@0.7.0':
     resolution: {integrity: sha512-ku5Qye/lk5end+b3Z0kqFB/tQ5LLp5v07qwdozm9zjPRlgnunboYeyX1X2xFCewfu9sCAyrLPPTCsCquEpqEWw==}
 
-  '@xtyle/astro@0.8.0':
-    resolution: {integrity: sha512-uVrOqGhvOXU+yafRV1G3nbGZFDtgzk2f6ZyfocBNw1SaSnD1WMVkggQ2VDoXEs3mwED9E9WZISLvreu1e3xFRQ==}
+  '@xtyle/astro@0.9.0':
+    resolution: {integrity: sha512-y2FE4RnfRIfqM6aK7eX0y6qU6DYHBFrxdi694OAIxR+DJVdPKfToeGuA5DZaPgOQk5YQzxu1mk7W/ZJg2qF4PA==}
     peerDependencies:
       astro: ^6.0.0
 
-  '@xtyle/core@0.8.0':
-    resolution: {integrity: sha512-xdp6Pk/n7wnqWkZRM6pYOJs4GEKONWGH/X+SKfk0pp6FZggnEecI62qaPeKfIw2GKILqLwtgSG8UE9a3w3En9Q==}
+  '@xtyle/core@0.9.0':
+    resolution: {integrity: sha512-Xu76kRoHolXsNPo+DHNHYZ1GnANpVX1UpoDiLe4fphN/Vy1+UrK2efhx8YELADlgPEtIz5F9Qao1hutHexQ+Xw==}
     hasBin: true
 
   accepts@2.0.0:
@@ -1294,6 +1289,11 @@ packages:
 
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
+
+  marked@18.0.6:
+    resolution: {integrity: sha512-MrV5puXBfuiy6wl6DLaq3BtIJQAJToAd5zt/ZKhRfGRAuFPALE7/4Y7jnxRQoEgK/pBgurGqLyAuRgZ2xOjr6w==}
+    engines: {node: '>= 20'}
+    hasBin: true
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -2681,19 +2681,20 @@ snapshots:
 
   '@xriptjs/sanitize@0.7.0': {}
 
-  '@xtyle/astro@0.8.0(patch_hash=1a4bba02fe89eede9707a1f0affa68a4b5ee32ec2d737e9f875ddba4cc1f1b6c)(astro@6.4.8(@types/node@26.1.1)(rollup@4.62.2))':
+  '@xtyle/astro@0.9.0(astro@6.4.8(@types/node@26.1.1)(rollup@4.62.2))':
     dependencies:
-      '@xtyle/core': 0.8.0
+      '@xtyle/core': 0.9.0
       astro: 6.4.8(@types/node@26.1.1)(rollup@4.62.2)
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
 
-  '@xtyle/core@0.8.0':
+  '@xtyle/core@0.9.0':
     dependencies:
       '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
       '@xriptjs/runtime': 0.7.0
       culori: 4.0.2
+      marked: 18.0.6
       prism-svelte: 0.5.0
       prismjs: 1.30.0
       zod: 3.25.76
@@ -3404,6 +3405,8 @@ snapshots:
       source-map-js: 1.2.1
 
   markdown-table@3.0.4: {}
+
+  marked@18.0.6: {}
 
   math-intrinsics@1.1.0: {}
 

@@ -2,6 +2,8 @@
 
 J5ML is a JSON representation of a markup tree.
 
+[![npm](https://img.shields.io/npm/v/%40nxis%2Fj5ml)](https://www.npmjs.com/package/@nxis/j5ml)
+
 ```ts
 import { parse, stringify } from "@nxis/j5ml";
 

@@ -39,6 +39,13 @@ export const XTYLE_NAME =
 export const XRIPT_NAME =
 	"xript--letter-x-x-12-y-4-s110-c8-o2cb--column-x16-s150-ko--letter-r-x18-y-4-s115-cf-o2cb---f0-Sigmar--ps-skittles";
 
+/**
+ * crates.io has no mark in any icon set, and the site serves its own to browsers
+ * only, so this one is generated rather than borrowed the way the two above are.
+ */
+export const CRATES_NAME =
+	"cratesio--hex-c3--hex-p1-x-14-y10-s75-ko---ps-skittles";
+
 const hex = (token) => register[token].replace("#", "");
 
 /**
@@ -57,7 +64,7 @@ export const FAVICON_NAME =
  * `resolveAlgorithm` (a filesystem read the published package cannot satisfy);
  * this uses the same algorithm imported as JS.
  */
-export function bakeLogo({ name = MASTHEAD_NAME, size = "md", px } = {}) {
+export function bakeLogo({ name = MASTHEAD_NAME, size = "md", px, label } = {}) {
 	const parsed = resolveIconMark(name);
 	if (!parsed) return null;
 
@@ -71,6 +78,16 @@ export function bakeLogo({ name = MASTHEAD_NAME, size = "md", px } = {}) {
 	if (!svg) return null;
 
 	if (px != null) svg = svg.replace('width="1em" height="1em"', `width="${px}" height="${px}"`);
+
+	// A generated mark titles itself from the leading segment of its name, and
+	// `Icon` never forwards its `label` to the generator, so that segment is the
+	// only thing a reader ever hears. `cratesio` is a fine identifier and a poor
+	// description, hence the override.
+	if (label != null) {
+		svg = svg
+			.replace(/<title>[^<]*<\/title>/, `<title>${label}</title>`)
+			.replace(/aria-label="[^"]*"/, `aria-label="${label}"`);
+	}
 
 	return `<span data-root data-icon>${svg}</span>`;
 }
