@@ -11,7 +11,7 @@ This is a multi-language monorepo. One spec, one shared conformance corpus, N im
 | `spec/j5ml.md` | the format: grammar, departures from JsonML, guarantees, conformance requirements |
 | `spec/conformance-tests.json` | the shared corpus every implementation is asserted against |
 | `rust/` | the `j5ml` crate: serde-based, complete |
-| `ts/` | the `j5ml` npm package: JSON5-based, complete |
+| `ts/` | the `@nxis/j5ml` npm package: JSON5-based, complete |
 | `csharp/` `python/` | planned; the directories are placeholders |
 | `site/` | Astro site for j5ml.dev |
 
