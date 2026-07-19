@@ -23,5 +23,8 @@ jobs:
       - name: pack
         run: dotnet pack csharp/src/J5ml/J5ml.csproj --configuration Release --no-build
 
+      # `--skip-duplicate` so a re-run against a version already on the registry
+      # is a no-op rather than a red build. Without it, retrying one registry after
+      # another has already published turns a partial release into a failing one.
       - name: push
-        run: dotnet nuget push csharp/src/J5ml/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push csharp/src/J5ml/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
